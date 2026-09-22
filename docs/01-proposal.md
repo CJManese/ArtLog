@@ -1,18 +1,24 @@
 # Proposal
 
-The submitted version is your Canvas answer for m8a1. This copy lives in the
-repository so the plan and the code sit next to each other.
+- **Core features.**
+  - User Sign In (Low Priority)
+  - Title and Description of the Commission piece
+  - Name, Prices, and Types of the Commission piece
+  - References (Gallery) of the Piece
+  - Notes to add on the Commission (Example: Changes to apply)
+  - Starting date and deadline (If deadline was mentioned). (Add duration to know how long the art has been in commission)
+  - Completion Status
+  - Payment Status
 
-Paste or rewrite the proposal here, and **keep it updated** as things change. A
-proposal that still describes a feature you cut in October is worse than no
-proposal.
+- **Where each piece is hosted.**
+  - Client: *Vercel*- Hosts the React/Vite frontend of ArtFlow. Free usage has limits on bandwidth and build resources.
+  - API: *Render*- Hosts the Express REST API that handles application requests and commission data. Free services may sleep when inactive, causing a delay on the first request.
+  - Database: *Neon*- Hosts the PostgreSQL database containing users, commissions, references, notes, and other application data. The free tier has limits on storage and usage.
 
-## The parts most likely to drift
-
-- **Core features.** Move anything you cut to stretch goals rather than deleting
-  it. The record of what you cut, and why, is worth marks.
-- **Where each piece is hosted.** Client, API, database, and the free tier's
-  catch for each. If you change host, note the date and the reason.
-- **The date demo mode goes off.** If that date has passed and it is still on,
-  that is the most important line in this file.
-- **Risks.** Which have shrunk, which grew, which turned out to be nothing.
+- **The date demo mode goes off.**
+  - 1st week of November
+- **Risks.** 
+   - Current Risks:
+     - The Login page might be harder than expected. It's now optional, and must only be tried last.   
+     - The Reference Gallery may easily run out of storage based on how large the file is
+     - The App needs to calculate the duration correctly
