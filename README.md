@@ -1,12 +1,8 @@
-# Your Project Name
-
-> **Replace this whole file.** It is a worked example of the README your project
-> will be graded from, not a file to leave as it is. Start with
-> [START-HERE.md](START-HERE.md).
+# Art Log
 
 One sentence saying what this does and who it is for.
 
-**Live site:** https://yourusername.github.io/your-repo-name/
+**Live site:** https://cjmanese.github.io/ArtLog/
 **API:** https://your-api.onrender.com/healthz
 **Demo video:** (link)
 
