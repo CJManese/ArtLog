@@ -30,7 +30,7 @@ Public repository:  https://cjmanese.github.io/ArtLog/
 This program tracks and logs in commissions. This is especially useful to me and my other artist friends, where multiple arts can be overwhelming, and it's easy to forget notes that buyers add given enough time.
 
 ## How to run it
--
+https://opulent-happiness-jj74qg5j9wxj3prvg-5173.app.github.dev/-
 
 ## Presentation
 Video (public Google Drive link): https://...
