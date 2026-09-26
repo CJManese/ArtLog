@@ -9,15 +9,15 @@ export default function Sidebar({ currentScreen, setCurrentScreen }) {
         </button>
 
         <button onClick={() => setCurrentScreen("create")}>
-          Make Commission Log
+          Create Log
         </button>
 
         <button onClick={() => setCurrentScreen("commissions")}>
-          Commission List
+          Commissions
         </button>
 
         <button onClick={() => setCurrentScreen("clients")}>
-          Client List
+          Clients
         </button>
 
         <button onClick={() => setCurrentScreen("settings")}>
