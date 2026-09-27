@@ -14,39 +14,36 @@ At least six entries. One per real use. Every entry needs a commit link.
 ### YYYY-MM-DD - short title
 
 - **Tool:**
+
 - **What I asked for:**
+
 - **What it gave back:**
+
 - **What I kept, what I changed, and why:**
-- **Commit:** https://github.com/YOUR-USERNAME/YOUR-REPO/commit/SHA
+
+- **Commit:** https://cjmanese.github.io/ArtLog/
 
 ## 2. Where the AI got it wrong
 
-Three cases. Be specific. If you write that the AI was never wrong, this section
-scores zero.
+### Case 1 - Framework case
 
-### Case 1 - short title
+- **Tool:**
+  ChatGPT
+- **What I asked for:**
+  I asked to look at my mockup and give me a framework I could work with.
+- **What it gave back:**
+  It gave me a framework, followed by my Dashboard and 
+- **What I kept, what I changed, and why:**
+  I kept what didn't need to be fixed, but I had to fix my Dashboard and databases because the AI won't stop adding other features like "date created" and "user description (not note)".
+- **Commit:** https://cjmanese.github.io/ArtLog/
 
-- **What it gave me:**
-- **What was wrong with it:**
-- **What I did instead:**
-- **Commit:** https://github.com/YOUR-USERNAME/YOUR-REPO/commit/SHA
+## 2. Where the AI got it wrong
 
+  1. When I asked for a framework, the AI made up a new code without following the mockup I sent.
+  2. When I asked for the client log, it added description and started date for client
+  3. When I asked for the dashboard, it added more features than the simplified one
+     
 ## 3. Who wrote what
 
-At least a fifth of this project is code you wrote yourself. Name it, and explain
-it in your own words.
-
-> Group projects: give each member their own heading below, and use your GitHub
-> handle as the heading. You are graded on your own section.
-
-### Written by me
-
-- **File:**
-- **Commit:**
-- **What it does and why it is built this way:**
-
-### The AI-written part I understand best
-
-- **File:**
-- **Commit:**
-- **What it does and why we kept it:**
+  While the AI wrote the framework for my program, I removed the hallucinations that the AI wrote, plus writing the data in the database, like titles and description. As for now, there's
+  not enough framework to write on, but there will be more in the next days.
