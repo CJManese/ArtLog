@@ -12,9 +12,10 @@
 
 ## What it does
 
--Logs ongoing commissions
--Logs clients
--Blacklisting clients
+- Displays commission logs by client in Dashboard
+- Creates and logs commissions
+- Creates and logs clients
+- Blacklisting clients
 
 ## Built with
 
