@@ -1,16 +1,10 @@
 import express from 'express'
 import cors from 'cors'
 import { pool } from './db/pool.js'
-import * as sightings from './sightingsRepo.js'
+import * as commissions from './sightingsRepo.js'
 
 const app = express()
 
-// CORS before the routes. Middleware registered after a route never sees that
-// route's requests, which is the m4 lesson showing up in production.
-//
-// Name your origins. app.use(cors()) with no options sends
-// Access-Control-Allow-Origin: *, which lets any site on the internet call this
-// API from a visitor's browser, and is incompatible with cookies.
 const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173')
   .split(',')
   .map((origin) => origin.trim())
@@ -19,13 +13,10 @@ const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173')
 app.use(cors({ origin: allowedOrigins }))
 app.use(express.json({ limit: '100kb' }))
 
-// Is the process alive?
 app.get('/healthz', (request, response) => {
   response.json({ ok: true })
 })
 
-// Is the database reachable? A different question, and the one that tells you
-// in two seconds which half of a problem you have.
 app.get('/readyz', async (request, response) => {
   try {
     await pool.query('SELECT 1')
@@ -36,71 +27,160 @@ app.get('/readyz', async (request, response) => {
   }
 })
 
-// Validation lives on the server because the client can be bypassed. The
-// browser form is for a fast, friendly message; this is for correctness.
-function validate(body) {
+function validateCommission(body) {
   const errors = []
-  const place = typeof body.place === 'string' ? body.place.trim() : ''
+
+  const client_id = Number(body.client_id)
+  const title = typeof body.title === 'string' ? body.title.trim() : ''
   const description =
     typeof body.description === 'string' ? body.description.trim() : ''
-  const spookiness = Number(body.spookiness)
+  const notes =
+    typeof body.notes === 'string' ? body.notes.trim() : ''
+  const commission_type =
+    typeof body.commission_type === 'string'
+      ? body.commission_type.trim()
+      : ''
+  const starting_date =
+    typeof body.starting_date === 'string'
+      ? body.starting_date
+      : ''
+  const deadline =
+    typeof body.deadline === 'string' && body.deadline
+      ? body.deadline
+      : null
+  const payment_status =
+    typeof body.payment_status === 'string'
+      ? body.payment_status.trim()
+      : 'Pending'
+  const status =
+    typeof body.status === 'string'
+      ? body.status.trim()
+      : 'Ongoing'
 
-  if (!place) errors.push('place is required')
-  if (place.length > 120) errors.push('place must be 120 characters or fewer')
-  if (description.length > 2000) errors.push('description must be 2000 characters or fewer')
-  if (!Number.isInteger(spookiness) || spookiness < 1 || spookiness > 5) {
-    errors.push('spookiness must be a whole number from 1 to 5')
+  if (!Number.isInteger(client_id) || client_id < 1) {
+    errors.push('client_id must be a valid client ID')
   }
 
-  return { errors, value: { place, description, spookiness } }
+  if (!title) {
+    errors.push('title is required')
+  }
+
+  if (title.length > 200) {
+    errors.push('title must be 200 characters or fewer')
+  }
+
+  if (!commission_type) {
+    errors.push('commission_type is required')
+  }
+
+  if (!starting_date) {
+    errors.push('starting_date is required')
+  }
+
+  if (!['Pending', 'Paid', 'Overdue'].includes(payment_status)) {
+    errors.push('payment_status must be Pending, Paid, or Overdue')
+  }
+
+  if (!['Ongoing', 'Completed', 'Cancelled'].includes(status)) {
+    errors.push('status must be Ongoing, Completed, or Cancelled')
+  }
+
+  return {
+    errors,
+    value: {
+      client_id,
+      title,
+      description,
+      notes,
+      commission_type,
+      starting_date,
+      deadline,
+      payment_status,
+      status
+    }
+  }
 }
 
-app.get('/api/sightings', async (request, response, next) => {
+// GET all commissions
+app.get('/api/commissions', async (request, response, next) => {
   try {
-    response.json(await sightings.getAll(pool))
+    response.json(await commissions.getAll(pool))
   } catch (error) {
     next(error)
   }
 })
 
-app.get('/api/sightings/:id', async (request, response, next) => {
+// GET one commission
+app.get('/api/commissions/:id', async (request, response, next) => {
   try {
-    const row = await sightings.getById(pool, request.params.id)
-    if (!row) return response.status(404).json({ error: 'Not found' })
+    const row = await commissions.getById(pool, request.params.id)
+
+    if (!row) {
+      return response.status(404).json({ error: 'Not found' })
+    }
+
     response.json(row)
   } catch (error) {
     next(error)
   }
 })
 
-app.post('/api/sightings', async (request, response, next) => {
-  const { errors, value } = validate(request.body ?? {})
-  if (errors.length > 0) return response.status(400).json({ error: errors.join('; ') })
+// CREATE commission
+app.post('/api/commissions', async (request, response, next) => {
+  const { errors, value } = validateCommission(request.body ?? {})
+
+  if (errors.length > 0) {
+    return response.status(400).json({
+      error: errors.join('; ')
+    })
+  }
 
   try {
-    response.status(201).json(await sightings.create(pool, value))
+    response.status(201).json(await commissions.create(pool, value))
   } catch (error) {
     next(error)
   }
 })
 
-app.put('/api/sightings/:id', async (request, response, next) => {
-  const { errors, value } = validate(request.body ?? {})
-  if (errors.length > 0) return response.status(400).json({ error: errors.join('; ') })
+// UPDATE commission
+app.put('/api/commissions/:id', async (request, response, next) => {
+  const { errors, value } = validateCommission(request.body ?? {})
+
+  if (errors.length > 0) {
+    return response.status(400).json({
+      error: errors.join('; ')
+    })
+  }
 
   try {
-    const row = await sightings.update(pool, request.params.id, value)
-    if (!row) return response.status(404).json({ error: 'Not found' })
+    const row = await commissions.update(
+      pool,
+      request.params.id,
+      value
+    )
+
+    if (!row) {
+      return response.status(404).json({ error: 'Not found' })
+    }
+
     response.json(row)
   } catch (error) {
     next(error)
   }
 })
 
-app.delete('/api/sightings/:id', async (request, response, next) => {
+// DELETE commission
+app.delete('/api/commissions/:id', async (request, response, next) => {
   try {
-    const removed = await sightings.remove(pool, request.params.id)
-    if (!removed) return response.status(404).json({ error: 'Not found' })
+    const removed = await commissions.remove(
+      pool,
+      request.params.id
+    )
+
+    if (!removed) {
+      return response.status(404).json({ error: 'Not found' })
+    }
+
     response.status(204).end()
   } catch (error) {
     next(error)
@@ -111,15 +191,13 @@ app.use((request, response) => {
   response.status(404).json({ error: 'No such route' })
 })
 
-// The detail goes in your logs; the visitor gets a plain message. Sending a
-// stack trace to a stranger tells them about your file layout and dependencies.
 app.use((error, request, response, next) => {
   console.error(error)
-  response.status(500).json({ error: 'Something went wrong on the server' })
+  response.status(500).json({
+    error: 'Something went wrong on the server'
+  })
 })
 
-// The host chooses the port and tells you through PORT. Hardcoding 3000 is the
-// commonest reason a first deploy is marked unhealthy and killed.
 const port = process.env.PORT || 3000
 
 app.listen(port, () => {
