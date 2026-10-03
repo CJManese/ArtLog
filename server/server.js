@@ -405,8 +405,3 @@ app.listen(port, '0.0.0.0', () => {
   console.log(`API listening on port ${port}`)
   console.log(`CORS allows: ${allowedOrigins.join(', ')}`)
 })
-
-  console.log(
-    `CORS allows: ${allowedOrigins.join(', ')}`
-  )
-})
