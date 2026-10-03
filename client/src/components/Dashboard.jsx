@@ -1,82 +1,147 @@
 import { useEffect, useState } from 'react'
 import { getCommissions } from '../api.js'
 
-function Dashboard({ onEditCommission }) {
+function Dashboard({ onEditCommission, onCreateCommission }) {
   const [commissions, setCommissions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    async function loadCommissions() {
-      try {
-        const data = await getCommissions()
-        setCommissions(data)
-      } catch (error) {
-        setError(error.message)
-      } finally {
-        setLoading(false)
-      }
+  async function loadCommissions() {
+    try {
+      setError('')
+      const data = await getCommissions()
+      setCommissions(data)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     loadCommissions()
   }, [])
 
   if (loading) {
     return (
-      <main>
+      <main className="page">
         <h1>Dashboard</h1>
         <p>Loading commissions...</p>
       </main>
     )
   }
 
-  if (error) {
-    return (
-      <main>
-        <h1>Dashboard</h1>
-        <p>Error: {error}</p>
-      </main>
-    )
-  }
+  const ongoing = commissions.filter(
+    (commission) => commission.status === 'Ongoing'
+  ).length
+
+  const completed = commissions.filter(
+    (commission) => commission.status === 'Completed'
+  ).length
+
+  const pending = commissions.filter(
+    (commission) => commission.payment_status === 'Pending'
+  ).length
 
   return (
-    <main>
-      <h1>Dashboard</h1>
+    <main className="page">
+      <div className="page-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p className="muted">
+            Keep track of your current art commissions.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={onCreateCommission}
+        >
+          + New Commission
+        </button>
+      </div>
+
+      {error && <p className="error">{error}</p>}
+
+      <section className="stats">
+        <div className="stat-card">
+          <strong>{commissions.length}</strong>
+          <span>Total</span>
+        </div>
+
+        <div className="stat-card">
+          <strong>{ongoing}</strong>
+          <span>Ongoing</span>
+        </div>
+
+        <div className="stat-card">
+          <strong>{completed}</strong>
+          <span>Completed</span>
+        </div>
+
+        <div className="stat-card">
+          <strong>{pending}</strong>
+          <span>Payment Pending</span>
+        </div>
+      </section>
+
+      <h2>Commission Board</h2>
 
       {commissions.length === 0 ? (
-        <p>No commissions yet.</p>
+        <div className="card">
+          <p>No commissions yet.</p>
+        </div>
       ) : (
-        <div>
+        <div className="card-grid">
           {commissions.map((commission) => (
-            <article key={commission.id}>
-              <h2>{commission.title}</h2>
+            <article className="card commission-card" key={commission.id}>
+              <div className="row-head">
+                <div>
+                  <h2>{commission.title}</h2>
+                  <p className="muted">
+                    {commission.client_name}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  className="icon-button"
+                  title="Edit commission"
+                  onClick={() =>
+                    onEditCommission?.(commission.id)
+                  }
+                >
+                  ⚙
+                </button>
+              </div>
 
               <p>
-                for {commission.client_name}
+                <strong>Commission Type:</strong>{' '}
+                {commission.commission_type}
               </p>
 
               <p>
-                Commission Type: {commission.commission_type}
+                <strong>Payment Status:</strong>{' '}
+                {commission.payment_status}
               </p>
 
               <p>
-                Payment Status: {commission.payment_status}
-              </p>
-
-              <p>
-                Deadline:{' '}
+                <strong>Deadline:</strong>{' '}
                 {commission.deadline || 'Not Specified'}
               </p>
 
               <p>
-                References
+                <strong>Status:</strong>{' '}
+                {commission.status}
               </p>
 
               <button
                 type="button"
-                onClick={() => onEditCommission?.(commission.id)}
+                onClick={() =>
+                  onEditCommission?.(commission.id)
+                }
               >
-                ⚙
+                Edit Commission
               </button>
             </article>
           ))}
