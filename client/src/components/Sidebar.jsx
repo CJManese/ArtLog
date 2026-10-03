@@ -1,45 +1,48 @@
 function Sidebar({ currentScreen, onNavigate }) {
   return (
-    <aside>
-      <h2>Art Log</h2>
+    <aside className="sidebar">
+      <div className="logo">
+        <h2>Art Log</h2>
+        <span>Commission Tracker</span>
+      </div>
 
       <nav>
         <button
           type="button"
+          className={currentScreen === 'dashboard' ? 'active' : ''}
           onClick={() => onNavigate('dashboard')}
-          disabled={currentScreen === 'dashboard'}
         >
           Dashboard
         </button>
 
         <button
           type="button"
+          className={currentScreen === 'create' ? 'active' : ''}
           onClick={() => onNavigate('create')}
-          disabled={currentScreen === 'create'}
         >
-          Make Commission
+          + Make Commission
         </button>
 
         <button
           type="button"
+          className={currentScreen === 'commissions' ? 'active' : ''}
           onClick={() => onNavigate('commissions')}
-          disabled={currentScreen === 'commissions'}
         >
-          Commission List
+          Commission Logs
         </button>
 
         <button
           type="button"
+          className={currentScreen === 'clients' ? 'active' : ''}
           onClick={() => onNavigate('clients')}
-          disabled={currentScreen === 'clients'}
         >
           Client List
         </button>
 
         <button
           type="button"
+          className={currentScreen === 'settings' ? 'active' : ''}
           onClick={() => onNavigate('settings')}
-          disabled={currentScreen === 'settings'}
         >
           Settings
         </button>
