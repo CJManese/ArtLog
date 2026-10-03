@@ -12,7 +12,9 @@ function CommissionList({ onEdit }) {
   async function loadCommissions() {
     try {
       setError('')
+
       const data = await getCommissions()
+
       setCommissions(data)
     } catch (err) {
       setError(err.message)
@@ -26,14 +28,24 @@ function CommissionList({ onEdit }) {
   }, [])
 
   async function handleDelete(id) {
-    if (!window.confirm('Delete this commission?')) {
+    if (
+      !window.confirm(
+        'Delete this commission permanently?'
+      )
+    ) {
       return
     }
 
     try {
+      setError('')
+
       await deleteCommission(id)
+
       setCommissions((current) =>
-        current.filter((commission) => commission.id !== id)
+        current.filter(
+          (commission) =>
+            commission.id !== id
+        )
       )
     } catch (err) {
       setError(err.message)
@@ -54,13 +66,18 @@ function CommissionList({ onEdit }) {
       <div className="page-header">
         <div>
           <h1>Commission Logs</h1>
+
           <p className="muted">
             View and manage all commissions.
           </p>
         </div>
       </div>
 
-      {error && <p className="error">{error}</p>}
+      {error && (
+        <p className="error">
+          {error}
+        </p>
+      )}
 
       {commissions.length === 0 ? (
         <div className="card">
@@ -69,39 +86,60 @@ function CommissionList({ onEdit }) {
       ) : (
         <div className="card-grid">
           {commissions.map((commission) => (
-            <article className="card commission-card" key={commission.id}>
+            <article
+              className="card commission-card"
+              key={commission.id}
+            >
               <div className="row-head">
-                <h2>{commission.title}</h2>
-                <span className={`status status-${commission.status?.toLowerCase()}`}>
+                <div>
+                  <h2>{commission.title}</h2>
+
+                  <p className="muted">
+                    Client: {commission.client_name}
+                  </p>
+                </div>
+
+                <span
+                  className={`status status-${commission.status?.toLowerCase()}`}
+                >
                   {commission.status}
                 </span>
               </div>
 
-              <p className="muted">
-                Client: {commission.client_name}
+              <p>
+                <strong>Type:</strong>{' '}
+                {commission.commission_type}
               </p>
 
               <p>
-                <strong>Type:</strong> {commission.commission_type}
+                <strong>Payment:</strong>{' '}
+                {commission.payment_status}
               </p>
 
               <p>
-                <strong>Payment:</strong> {commission.payment_status}
-              </p>
-
-              <p>
-                <strong>Started:</strong> {commission.starting_date}
+                <strong>Started:</strong>{' '}
+                {commission.starting_date}
               </p>
 
               <p>
                 <strong>Deadline:</strong>{' '}
-                {commission.deadline || 'Not specified'}
+                {commission.deadline ||
+                  'Not specified'}
               </p>
+
+              {commission.description && (
+                <p>
+                  <strong>Description:</strong>{' '}
+                  {commission.description}
+                </p>
+              )}
 
               <div className="button-row">
                 <button
                   type="button"
-                  onClick={() => onEdit?.(commission.id)}
+                  onClick={() =>
+                    onEdit?.(commission.id)
+                  }
                 >
                   Edit
                 </button>
@@ -109,7 +147,11 @@ function CommissionList({ onEdit }) {
                 <button
                   type="button"
                   className="danger"
-                  onClick={() => handleDelete(commission.id)}
+                  onClick={() =>
+                    handleDelete(
+                      commission.id
+                    )
+                  }
                 >
                   Delete
                 </button>
