@@ -59,6 +59,29 @@ export async function deleteCommission(id) {
 }
 
 // ====================
+// REFERENCES
+// ====================
+
+export async function getReferences(commissionId) {
+  return request(`/commissions/${commissionId}/references`)
+}
+
+export async function createReference(commissionId, imageUrl) {
+  return request(`/commissions/${commissionId}/references`, {
+    method: 'POST',
+    body: JSON.stringify({
+      image_url: imageUrl,
+    }),
+  })
+}
+
+export async function deleteReference(id) {
+  return request(`/references/${id}`, {
+    method: 'DELETE',
+  })
+}
+
+// ====================
 // CLIENTS
 // ====================
 
