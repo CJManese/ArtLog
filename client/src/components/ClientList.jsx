@@ -9,6 +9,7 @@ import {
 function ClientList() {
   const [clients, setClients] = useState([])
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
   const [editingClient, setEditingClient] = useState(null)
@@ -19,10 +20,12 @@ function ClientList() {
   async function loadClients() {
     try {
       setError('')
+
       const data = await getClients()
+
       setClients(data)
-    } catch (error) {
-      setError(error.message)
+    } catch (err) {
+      setError(err.message)
     } finally {
       setLoading(false)
     }
@@ -32,27 +35,24 @@ function ClientList() {
     loadClients()
   }, [])
 
-  function startCreate() {
-    setEditingClient('new')
+  function resetForm() {
+    setEditingClient(null)
     setName('')
     setNotes('')
     setBlacklisted(false)
+  }
+
+  function startCreate() {
+    resetForm()
+    setEditingClient('new')
     setError('')
   }
 
   function startEdit(client) {
     setEditingClient(client.id)
-    setName(client.name)
+    setName(client.name || '')
     setNotes(client.notes || '')
-    setBlacklisted(client.blacklisted)
-    setError('')
-  }
-
-  function cancelEdit() {
-    setEditingClient(null)
-    setName('')
-    setNotes('')
-    setBlacklisted(false)
+    setBlacklisted(Boolean(client.blacklisted))
     setError('')
   }
 
@@ -64,9 +64,10 @@ function ClientList() {
       return
     }
 
-    try {
-      setError('')
+    setSaving(true)
+    setError('')
 
+    try {
       const data = {
         name: name.trim(),
         notes: notes.trim(),
@@ -79,16 +80,18 @@ function ClientList() {
         await updateClient(editingClient, data)
       }
 
-      cancelEdit()
+      resetForm()
       await loadClients()
-    } catch (error) {
-      setError(error.message)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSaving(false)
     }
   }
 
   async function handleDelete(id) {
     const confirmed = window.confirm(
-      'Are you sure you want to delete this client?'
+      'Delete this client? Any commissions belonging to this client will also be deleted.'
     )
 
     if (!confirmed) {
@@ -97,146 +100,212 @@ function ClientList() {
 
     try {
       setError('')
+
       await deleteClient(id)
+
       await loadClients()
-    } catch (error) {
-      setError(error.message)
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  async function toggleBlacklist(client) {
+    try {
+      setError('')
+
+      await updateClient(client.id, {
+        name: client.name,
+        notes: client.notes || '',
+        blacklisted: !client.blacklisted
+      })
+
+      await loadClients()
+    } catch (err) {
+      setError(err.message)
     }
   }
 
   if (loading) {
     return (
-      <main>
-        <h1>Clients</h1>
+      <main className="page">
+        <h1>Client List</h1>
         <p>Loading clients...</p>
       </main>
     )
   }
 
   return (
-    <main>
-      <h1>Clients</h1>
+    <main className="page">
+      <div className="page-header">
+        <div>
+          <h1>Client List</h1>
+          <p className="muted">
+            Keep track of frequent buyers and blacklisted clients.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={startCreate}
+        >
+          + Add Client
+        </button>
+      </div>
 
       {error && (
-        <p>
+        <p className="error">
           {error}
         </p>
       )}
 
-      <button
-        type="button"
-        onClick={startCreate}
-      >
-        Add a Client
-      </button>
-
       {editingClient !== null && (
-        <form onSubmit={handleSave}>
-          <h2>
+        <form
+          className="card form-grid"
+          onSubmit={handleSave}
+        >
+          <h2 className="form-title">
             {editingClient === 'new'
-              ? 'Add a Client'
+              ? 'Add Client'
               : 'Edit Client'}
           </h2>
 
-          <div>
-            <label htmlFor="client-name">
-              Name
-            </label>
+          <label htmlFor="client-name">
+            Name
+          </label>
 
+          <input
+            id="client-name"
+            type="text"
+            value={name}
+            onChange={(event) =>
+              setName(event.target.value)
+            }
+            required
+          />
+
+          <label htmlFor="client-notes">
+            Notes
+          </label>
+
+          <textarea
+            id="client-notes"
+            rows="4"
+            value={notes}
+            onChange={(event) =>
+              setNotes(event.target.value)
+            }
+          />
+
+          <label htmlFor="client-blacklisted">
+            Blacklisted
+          </label>
+
+          <div>
             <input
-              id="client-name"
-              type="text"
-              value={name}
+              id="client-blacklisted"
+              type="checkbox"
+              checked={blacklisted}
               onChange={(event) =>
-                setName(event.target.value)
+                setBlacklisted(event.target.checked)
               }
             />
+
+            <span className="checkbox-text">
+              Do not accept commissions from this client
+            </span>
           </div>
 
-          <div>
-            <label htmlFor="client-notes">
-              Notes
-            </label>
+          <div className="button-row form-actions">
+            <button
+              type="button"
+              onClick={resetForm}
+              disabled={saving}
+            >
+              Cancel
+            </button>
 
-            <textarea
-              id="client-notes"
-              value={notes}
-              onChange={(event) =>
-                setNotes(event.target.value)
-              }
-            />
+            <button
+              type="submit"
+              disabled={saving}
+            >
+              {saving ? 'Saving...' : 'Save Client'}
+            </button>
           </div>
-
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                checked={blacklisted}
-                onChange={(event) =>
-                  setBlacklisted(event.target.checked)
-                }
-              />
-
-              Blacklisted
-            </label>
-          </div>
-
-          <button
-            type="button"
-            onClick={cancelEdit}
-          >
-            Cancel
-          </button>
-
-          <button type="submit">
-            Save
-          </button>
         </form>
       )}
 
       {clients.length === 0 ? (
-        <p>No clients yet.</p>
+        <div className="card">
+          <p>No clients yet.</p>
+          <button
+            type="button"
+            onClick={startCreate}
+          >
+            Add Your First Client
+          </button>
+        </div>
       ) : (
-        <div>
+        <div className="card-grid">
           {clients.map((client) => (
-            <article key={client.id}>
-              <h2>{client.name}</h2>
+            <article
+              className={`card client-card ${
+                client.blacklisted
+                  ? 'blacklisted-card'
+                  : ''
+              }`}
+              key={client.id}
+            >
+              <div className="row-head">
+                <div>
+                  <h2>{client.name}</h2>
+
+                  {client.blacklisted && (
+                    <span className="status status-cancelled">
+                      Blacklisted
+                    </span>
+                  )}
+                </div>
+              </div>
 
               <p>
-                ID: {client.id}
-              </p>
-
-              <p>
-                Commissions made: {client.commission_count}
-              </p>
-
-              <p>
-                {client.blacklisted
-                  ? 'Blacklisted'
-                  : 'Not Blacklisted'}
+                <strong>Commissions:</strong>{' '}
+                {client.commission_count ?? 0}
               </p>
 
               {client.notes && (
                 <p>
-                  Notes: {client.notes}
+                  <strong>Notes:</strong>{' '}
+                  {client.notes}
                 </p>
               )}
 
-              <button
-                type="button"
-                onClick={() => startEdit(client)}
-              >
-                Edit Client
-              </button>
+              <div className="button-row">
+                <button
+                  type="button"
+                  onClick={() => startEdit(client)}
+                >
+                  Edit
+                </button>
 
-              <button
-                type="button"
-                onClick={() =>
-                  handleDelete(client.id)
-                }
-              >
-                Delete Client
-              </button>
+                <button
+                  type="button"
+                  onClick={() => toggleBlacklist(client)}
+                >
+                  {client.blacklisted
+                    ? 'Remove Blacklist'
+                    : 'Blacklist'}
+                </button>
+
+                <button
+                  type="button"
+                  className="danger"
+                  onClick={() =>
+                    handleDelete(client.id)
+                  }
+                >
+                  Delete
+                </button>
+              </div>
             </article>
           ))}
         </div>
