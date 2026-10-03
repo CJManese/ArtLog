@@ -3,6 +3,7 @@ import cors from 'cors'
 import { pool } from './db/pool.js'
 import * as commissions from './sightingsRepo.js'
 import * as clients from './clientsRepo.js'
+import * as references from './referencesRepo.js'
 
 const app = express()
 
@@ -14,25 +15,35 @@ const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173')
 app.use(cors({ origin: allowedOrigins }))
 app.use(express.json({ limit: '100kb' }))
 
-// Health check
+// ====================
+// HEALTH
+// ====================
+
 app.get('/healthz', (request, response) => {
   response.json({ ok: true })
 })
 
-// Database check
 app.get('/readyz', async (request, response) => {
   try {
     await pool.query('SELECT 1')
-    response.json({ ok: true, db: 'up' })
+
+    response.json({
+      ok: true,
+      db: 'up'
+    })
   } catch (error) {
     console.error('readyz failed:', error.message)
-    response.status(503).json({ ok: false, db: 'down' })
+
+    response.status(503).json({
+      ok: false,
+      db: 'down'
+    })
   }
 })
 
-// --------------------
+// ====================
 // COMMISSION VALIDATION
-// --------------------
+// ====================
 
 function validateCommission(body) {
   const errors = []
@@ -127,11 +138,10 @@ function validateCommission(body) {
   }
 }
 
-// --------------------
-// COMMISSION ROUTES
-// --------------------
+// ====================
+// COMMISSIONS
+// ====================
 
-// GET all commissions
 app.get('/api/commissions', async (request, response, next) => {
   try {
     response.json(
@@ -142,7 +152,6 @@ app.get('/api/commissions', async (request, response, next) => {
   }
 })
 
-// GET one commission
 app.get('/api/commissions/:id', async (request, response, next) => {
   try {
     const row = await commissions.getById(
@@ -152,7 +161,7 @@ app.get('/api/commissions/:id', async (request, response, next) => {
 
     if (!row) {
       return response.status(404).json({
-        error: 'Not found'
+        error: 'Commission not found'
       })
     }
 
@@ -162,7 +171,6 @@ app.get('/api/commissions/:id', async (request, response, next) => {
   }
 })
 
-// CREATE commission
 app.post('/api/commissions', async (request, response, next) => {
   const { errors, value } = validateCommission(
     request.body ?? {}
@@ -186,7 +194,6 @@ app.post('/api/commissions', async (request, response, next) => {
   }
 })
 
-// UPDATE commission
 app.put('/api/commissions/:id', async (request, response, next) => {
   const { errors, value } = validateCommission(
     request.body ?? {}
@@ -207,7 +214,7 @@ app.put('/api/commissions/:id', async (request, response, next) => {
 
     if (!row) {
       return response.status(404).json({
-        error: 'Not found'
+        error: 'Commission not found'
       })
     }
 
@@ -217,7 +224,6 @@ app.put('/api/commissions/:id', async (request, response, next) => {
   }
 })
 
-// DELETE commission
 app.delete('/api/commissions/:id', async (request, response, next) => {
   try {
     const removed = await commissions.remove(
@@ -227,7 +233,7 @@ app.delete('/api/commissions/:id', async (request, response, next) => {
 
     if (!removed) {
       return response.status(404).json({
-        error: 'Not found'
+        error: 'Commission not found'
       })
     }
 
@@ -237,11 +243,102 @@ app.delete('/api/commissions/:id', async (request, response, next) => {
   }
 })
 
-// --------------------
-// CLIENT ROUTES
-// --------------------
+// ====================
+// COMMISSION REFERENCES
+// ====================
 
-// GET all clients
+app.get(
+  '/api/commissions/:id/references',
+  async (request, response, next) => {
+    try {
+      const commission = await commissions.getById(
+        pool,
+        request.params.id
+      )
+
+      if (!commission) {
+        return response.status(404).json({
+          error: 'Commission not found'
+        })
+      }
+
+      const rows = await references.getByCommissionId(
+        pool,
+        request.params.id
+      )
+
+      response.json(rows)
+    } catch (error) {
+      next(error)
+    }
+  }
+)
+
+app.post(
+  '/api/commissions/:id/references',
+  async (request, response, next) => {
+    const imageUrl =
+      typeof request.body?.image_url === 'string'
+        ? request.body.image_url.trim()
+        : ''
+
+    if (!imageUrl) {
+      return response.status(400).json({
+        error: 'image_url is required'
+      })
+    }
+
+    try {
+      const commission = await commissions.getById(
+        pool,
+        request.params.id
+      )
+
+      if (!commission) {
+        return response.status(404).json({
+          error: 'Commission not found'
+        })
+      }
+
+      const row = await references.create(
+        pool,
+        request.params.id,
+        imageUrl
+      )
+
+      response.status(201).json(row)
+    } catch (error) {
+      next(error)
+    }
+  }
+)
+
+app.delete(
+  '/api/references/:id',
+  async (request, response, next) => {
+    try {
+      const removed = await references.remove(
+        pool,
+        request.params.id
+      )
+
+      if (!removed) {
+        return response.status(404).json({
+          error: 'Reference not found'
+        })
+      }
+
+      response.status(204).end()
+    } catch (error) {
+      next(error)
+    }
+  }
+)
+
+// ====================
+// CLIENTS
+// ====================
+
 app.get('/api/clients', async (request, response, next) => {
   try {
     response.json(
@@ -252,7 +349,6 @@ app.get('/api/clients', async (request, response, next) => {
   }
 })
 
-// GET one client
 app.get('/api/clients/:id', async (request, response, next) => {
   try {
     const row = await clients.getById(
@@ -262,7 +358,7 @@ app.get('/api/clients/:id', async (request, response, next) => {
 
     if (!row) {
       return response.status(404).json({
-        error: 'Not found'
+        error: 'Client not found'
       })
     }
 
@@ -272,7 +368,6 @@ app.get('/api/clients/:id', async (request, response, next) => {
   }
 })
 
-// CREATE client
 app.post('/api/clients', async (request, response, next) => {
   const name =
     typeof request.body?.name === 'string'
@@ -285,7 +380,7 @@ app.post('/api/clients', async (request, response, next) => {
       : ''
 
   const blacklisted =
-    request.body?.blacklisted ?? false
+    Boolean(request.body?.blacklisted)
 
   if (!name) {
     return response.status(400).json({
@@ -309,7 +404,6 @@ app.post('/api/clients', async (request, response, next) => {
   }
 })
 
-// UPDATE client
 app.put('/api/clients/:id', async (request, response, next) => {
   const name =
     typeof request.body?.name === 'string'
@@ -322,7 +416,7 @@ app.put('/api/clients/:id', async (request, response, next) => {
       : ''
 
   const blacklisted =
-    request.body?.blacklisted ?? false
+    Boolean(request.body?.blacklisted)
 
   if (!name) {
     return response.status(400).json({
@@ -343,7 +437,7 @@ app.put('/api/clients/:id', async (request, response, next) => {
 
     if (!row) {
       return response.status(404).json({
-        error: 'Not found'
+        error: 'Client not found'
       })
     }
 
@@ -353,7 +447,6 @@ app.put('/api/clients/:id', async (request, response, next) => {
   }
 })
 
-// DELETE client
 app.delete('/api/clients/:id', async (request, response, next) => {
   try {
     const removed = await clients.remove(
@@ -363,7 +456,7 @@ app.delete('/api/clients/:id', async (request, response, next) => {
 
     if (!removed) {
       return response.status(404).json({
-        error: 'Not found'
+        error: 'Client not found'
       })
     }
 
@@ -373,9 +466,9 @@ app.delete('/api/clients/:id', async (request, response, next) => {
   }
 })
 
-// --------------------
-// 404 HANDLER
-// --------------------
+// ====================
+// 404
+// ====================
 
 app.use((request, response) => {
   response.status(404).json({
@@ -383,9 +476,9 @@ app.use((request, response) => {
   })
 })
 
-// --------------------
+// ====================
 // ERROR HANDLER
-// --------------------
+// ====================
 
 app.use((error, request, response, next) => {
   console.error(error)
@@ -395,9 +488,9 @@ app.use((error, request, response, next) => {
   })
 })
 
-// --------------------
+// ====================
 // START SERVER
-// --------------------
+// ====================
 
 const port = process.env.PORT || 3000
 
