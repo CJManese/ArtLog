@@ -401,10 +401,10 @@ app.use((error, request, response, next) => {
 
 const port = process.env.PORT || 3000
 
-app.listen(port, () => {
-  console.log(
-    `API listening on http://localhost:${port}`
-  )
+app.listen(port, '0.0.0.0', () => {
+  console.log(`API listening on port ${port}`)
+  console.log(`CORS allows: ${allowedOrigins.join(', ')}`)
+})
 
   console.log(
     `CORS allows: ${allowedOrigins.join(', ')}`
