@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  'https://artlog-zk7a.onrender.com'
 
 async function request(path, options = {}) {
   const response = await fetch(`${API_BASE}/api${path}`, {
@@ -11,6 +13,7 @@ async function request(path, options = {}) {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}))
+
     throw new Error(
       error.error || `Request failed with status ${response.status}`
     )
@@ -23,7 +26,9 @@ async function request(path, options = {}) {
   return response.json()
 }
 
+// ====================
 // COMMISSIONS
+// ====================
 
 export async function getCommissions() {
   return request('/commissions')
@@ -53,7 +58,9 @@ export async function deleteCommission(id) {
   })
 }
 
+// ====================
 // CLIENTS
+// ====================
 
 export async function getClients() {
   return request('/clients')
