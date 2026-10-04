@@ -50,10 +50,6 @@ function Dashboard({ onEditCommission, onCreateCommission }) {
       <div className="page-header">
         <div>
           <h1>Dashboard</h1>
-
-          <p className="muted">
-            Keep track of your current art commissions.
-          </p>
         </div>
 
         <button
