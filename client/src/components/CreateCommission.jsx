@@ -133,11 +133,7 @@ function CreateCommission({ onSaved, onCancel }) {
     <main className="page">
       <div className="page-header">
         <div>
-          <h1>Make Commission</h1>
-
-          <p className="muted">
-            Create a new commission log.
-          </p>
+          <h1>Commission Log</h1>
         </div>
       </div>
 
