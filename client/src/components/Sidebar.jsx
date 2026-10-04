@@ -39,13 +39,6 @@ function Sidebar({ currentScreen, onNavigate }) {
           Clients
         </button>
 
-        <button
-          type="button"
-          className={currentScreen === 'settings' ? 'active' : ''}
-          onClick={() => onNavigate('settings')}
-        >
-          Settings
-        </button>
       </nav>
     </aside>
   )
