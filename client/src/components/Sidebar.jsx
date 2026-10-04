@@ -2,7 +2,7 @@ function Sidebar({ currentScreen, onNavigate }) {
   return (
     <aside className="sidebar">
       <div className="logo">
-        <h2>Art Log</h2>
+        <h2>ArtLog</h2>
         <span>Commission Tracker</span>
       </div>
 
@@ -20,7 +20,7 @@ function Sidebar({ currentScreen, onNavigate }) {
           className={currentScreen === 'create' ? 'active' : ''}
           onClick={() => onNavigate('create')}
         >
-          + Make Commission
+          Create Log
         </button>
 
         <button
@@ -28,7 +28,7 @@ function Sidebar({ currentScreen, onNavigate }) {
           className={currentScreen === 'commissions' ? 'active' : ''}
           onClick={() => onNavigate('commissions')}
         >
-          Commission Logs
+          Commissions
         </button>
 
         <button
@@ -36,7 +36,7 @@ function Sidebar({ currentScreen, onNavigate }) {
           className={currentScreen === 'clients' ? 'active' : ''}
           onClick={() => onNavigate('clients')}
         >
-          Client List
+          Clients
         </button>
 
         <button
