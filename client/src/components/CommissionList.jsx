@@ -119,11 +119,8 @@ function CommissionList({ onEdit }) {
     <main className="page">
       <div className="page-header">
         <div>
-          <h1>Commissions</h1>
+          <h1>Commission Board</h1>
 
-          <p className="muted">
-            View and manage your commission logs.
-          </p>
         </div>
       </div>
 
