@@ -61,10 +61,10 @@ function EditCommission({
         commission.commission_type || ''
       )
       setStartingDate(
-        commission.starting_date || ''
+        (commission.starting_date || '').slice(0, 10)
       )
       setDeadline(
-        commission.deadline || ''
+        (commission.deadline || '').slice(0, 10)
       )
       setPaymentStatus(
         commission.payment_status || 'Pending'
@@ -203,7 +203,9 @@ function EditCommission({
   if (loading) {
     return (
       <main className="page">
-        <h1>Edit Commission</h1>
+        <div className="page-header">
+          <h1>Edit Commission</h1>
+        </div>
         <p>Loading commission...</p>
       </main>
     )
@@ -212,13 +214,7 @@ function EditCommission({
   return (
     <main className="page">
       <div className="page-header">
-        <div>
-          <h1>Edit Commission</h1>
-
-          <p className="muted">
-            Update the commission log.
-          </p>
-        </div>
+        <h1>Edit Commission</h1>
       </div>
 
       {error && (
@@ -397,15 +393,7 @@ function EditCommission({
       </form>
 
       <section className="card references-section">
-        <div className="page-header">
-          <div>
-            <h2>References</h2>
-
-            <p className="muted">
-              Images or links related to this commission.
-            </p>
-          </div>
-        </div>
+        <h2>References</h2>
 
         {referenceError && (
           <p className="error">
