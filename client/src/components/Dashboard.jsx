@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getCommissions } from '../api.js'
 
-function Dashboard({
-  onEditCommission,
-  onCreateCommission
-}) {
+function Dashboard({ onEditCommission, onCreateCommission }) {
   const [commissions, setCommissions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -37,18 +34,15 @@ function Dashboard({
   }
 
   const ongoing = commissions.filter(
-    (commission) =>
-      commission.status === 'Ongoing'
+    (commission) => commission.status === 'Ongoing'
   ).length
 
   const completed = commissions.filter(
-    (commission) =>
-      commission.status === 'Completed'
+    (commission) => commission.status === 'Completed'
   ).length
 
   const pending = commissions.filter(
-    (commission) =>
-      commission.payment_status === 'Pending'
+    (commission) => commission.payment_status === 'Pending'
   ).length
 
   return (
@@ -66,7 +60,7 @@ function Dashboard({
           type="button"
           onClick={onCreateCommission}
         >
-          + New Commission
+          + Create Log
         </button>
       </div>
 
@@ -98,20 +92,11 @@ function Dashboard({
         </div>
       </section>
 
-      <div className="section-heading">
-        <h2>Commission Board</h2>
-      </div>
+      <h2>Commission Board</h2>
 
       {commissions.length === 0 ? (
         <div className="card">
           <p>No commissions yet.</p>
-
-          <button
-            type="button"
-            onClick={onCreateCommission}
-          >
-            Create Your First Commission
-          </button>
         </div>
       ) : (
         <div className="card-grid">
@@ -125,7 +110,7 @@ function Dashboard({
                   <h2>{commission.title}</h2>
 
                   <p className="muted">
-                    {commission.client_name}
+                    for {commission.client_name}
                   </p>
                 </div>
 
@@ -133,10 +118,9 @@ function Dashboard({
                   type="button"
                   className="icon-button"
                   title="Edit commission"
+                  aria-label={`Edit ${commission.title}`}
                   onClick={() =>
-                    onEditCommission?.(
-                      commission.id
-                    )
+                    onEditCommission?.(commission.id)
                   }
                 >
                   ⚙
@@ -154,30 +138,19 @@ function Dashboard({
               </p>
 
               <p>
+                <strong>Started:</strong>{' '}
+                {commission.starting_date || 'Not Specified'}
+              </p>
+
+              <p>
                 <strong>Deadline:</strong>{' '}
-                {commission.deadline ||
-                  'Not Specified'}
+                {commission.deadline || 'Not Specified'}
               </p>
 
               <p>
                 <strong>Status:</strong>{' '}
-                <span
-                  className={`status status-${commission.status?.toLowerCase()}`}
-                >
-                  {commission.status}
-                </span>
+                {commission.status}
               </p>
-
-              <button
-                type="button"
-                onClick={() =>
-                  onEditCommission?.(
-                    commission.id
-                  )
-                }
-              >
-                Edit Commission
-              </button>
             </article>
           ))}
         </div>
