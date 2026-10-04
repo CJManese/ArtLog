@@ -3,7 +3,6 @@ function Sidebar({ currentScreen, onNavigate }) {
     <aside className="sidebar">
       <div className="logo">
         <h2>ArtLog</h2>
-        <span>Commission Tracker</span>
       </div>
 
       <nav>
