@@ -678,6 +678,7 @@ button {
    ================================ */
 
 .page .card-scroll .create-card {
+  margin-bottom: 8px;
   flex: 0 0 285px;
 
   width: 285px;
