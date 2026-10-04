@@ -1,44 +1,42 @@
+import logo from '../Assets/Logo.png'
+
 function Sidebar({ currentScreen, onNavigate }) {
+  const items = [
+    ['dashboard', 'Dashboard'],
+    ['create', 'Create Log'],
+    ['commissions', 'Commissions'],
+    ['clients', 'Clients']
+  ]
+
   return (
     <aside className="sidebar">
       <div className="logo">
-        <h2>ArtLog</h2>
+        <img src={logo} alt="" />
+        <h2>
+          Art<span>Log</span>
+        </h2>
       </div>
 
       <nav>
-        <button
-          type="button"
-          className={currentScreen === 'dashboard' ? 'active' : ''}
-          onClick={() => onNavigate('dashboard')}
-        >
-          Dashboard
-        </button>
-
-        <button
-          type="button"
-          className={currentScreen === 'create' ? 'active' : ''}
-          onClick={() => onNavigate('create')}
-        >
-          Create Log
-        </button>
-
-        <button
-          type="button"
-          className={currentScreen === 'commissions' ? 'active' : ''}
-          onClick={() => onNavigate('commissions')}
-        >
-          Commissions
-        </button>
-
-        <button
-          type="button"
-          className={currentScreen === 'clients' ? 'active' : ''}
-          onClick={() => onNavigate('clients')}
-        >
-          Clients
-        </button>
-
+        {items.map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            className={currentScreen === key ? 'active' : ''}
+            onClick={() => onNavigate(key)}
+          >
+            {label}
+          </button>
+        ))}
       </nav>
+
+      <button
+        type="button"
+        className="logout"
+        onClick={() => window.alert('Log out is not available yet.')}
+      >
+        Log Out
+      </button>
     </aside>
   )
 }
