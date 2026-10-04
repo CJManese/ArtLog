@@ -57,11 +57,16 @@ function Dashboard({ onEditCommission, onCreateCommission }) {
     try {
       setError('')
 
-      const data = await getCommissions()
+      const all = await getCommissions()
+
+      // Completed commissions do not show on the Dashboard
+      const data = all.filter(
+        (commission) => commission.status !== 'Completed'
+      )
 
       setCommissions(data)
 
-      // Load the references for every commission.
+      // Load the references for every commission shown.
       // If one fails, that card just shows no references.
       const entries = await Promise.all(
         data.map(async (commission) => {
