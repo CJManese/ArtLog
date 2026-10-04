@@ -51,13 +51,6 @@ function Dashboard({ onEditCommission, onCreateCommission }) {
         <div>
           <h1>Dashboard</h1>
         </div>
-
-        <button
-          type="button"
-          onClick={onCreateCommission}
-        >
-          + Create Log
-        </button>
       </div>
 
       {error && (
