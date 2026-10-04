@@ -123,7 +123,7 @@ function CreateCommission({ onSaved, onCancel }) {
   if (loading) {
     return (
       <main className="page">
-        <h1>Make Commission</h1>
+        <h1>Create Log</h1>
         <p>Loading clients...</p>
       </main>
     )
