@@ -719,3 +719,56 @@ label {
     flex-wrap: wrap;
   }
 }
+
+/* ================================
+   DASHBOARD: grey deadline + references
+   ================================ */
+
+.commission-card .deadline,
+.commission-card .deadline strong {
+  color: #8a8791;
+}
+
+.ref-block {
+  margin-bottom: 4px;
+}
+
+.page .ref-toggle {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.page .ref-toggle:hover {
+  filter: none;
+  text-decoration: underline;
+}
+
+.ref-strip {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  padding-bottom: 6px;
+  overflow-x: auto;
+}
+
+.ref-thumb {
+  flex: 0 0 auto;
+  display: block;
+  width: 70px;
+  height: 70px;
+  border: 2px solid #1f1f24;
+  background: #eee;
+  overflow: hidden;
+}
+
+.ref-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
