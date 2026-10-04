@@ -244,7 +244,7 @@ function CreateCommission({ onSaved, onCancel }) {
             <label htmlFor="reference-url">References (Optional)</label>
 
             <div className="ref-box">
-              <span className="ref-plus">+</span>
+
 
               <input
                 id="reference-url"
