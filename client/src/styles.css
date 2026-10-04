@@ -580,41 +580,6 @@ textarea {
 }
 
 /* ================================
-   SETTINGS
-   ================================ */
-
-.settings-card {
-  max-width: 800px;
-}
-
-.settings-row {
-  display: flex;
-
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 20px;
-
-  padding: 20px 0;
-
-  border-bottom: 1px solid #e4e1dc;
-}
-
-.settings-row:last-child {
-  border-bottom: 0;
-}
-
-.settings-row strong {
-  font-size: 15px;
-}
-
-.settings-row p {
-  margin: 6px 0 0;
-
-  font-size: 14px;
-}
-
-/* ================================
    BUTTON ROWS
    ================================ */
 
