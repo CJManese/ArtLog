@@ -1,6 +1,26 @@
 import { useEffect, useState } from 'react'
 import { getCommissions } from '../api.js'
 
+// Turns "2026-10-03T00:00:00.000Z" into "10/03/2026"
+function formatDate(value) {
+  if (!value) {
+    return 'Not Specified'
+  }
+
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+
+  return date.toLocaleDateString('en-US', {
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric',
+    timeZone: 'UTC'
+  })
+}
+
 function Dashboard({ onEditCommission, onCreateCommission }) {
   const [commissions, setCommissions] = useState([])
   const [loading, setLoading] = useState(true)
@@ -27,30 +47,18 @@ function Dashboard({ onEditCommission, onCreateCommission }) {
   if (loading) {
     return (
       <main className="page">
-        <h1>Dashboard</h1>
+        <div className="page-header">
+          <h1>Dashboard</h1>
+        </div>
         <p>Loading commissions...</p>
       </main>
     )
   }
 
-  const ongoing = commissions.filter(
-    (commission) => commission.status === 'Ongoing'
-  ).length
-
-  const completed = commissions.filter(
-    (commission) => commission.status === 'Completed'
-  ).length
-
-  const pending = commissions.filter(
-    (commission) => commission.payment_status === 'Pending'
-  ).length
-
   return (
     <main className="page">
       <div className="page-header">
-        <div>
-          <h1>Dashboard</h1>
-        </div>
+        <h1>Dashboard</h1>
       </div>
 
       {error && (
@@ -59,91 +67,72 @@ function Dashboard({ onEditCommission, onCreateCommission }) {
         </p>
       )}
 
-      <section className="stats">
-        <div className="stat-card">
-          <strong>{commissions.length}</strong>
-          <span>Total</span>
-        </div>
+      <div className="card-scroll">
+        {commissions.map((commission) => (
+          <article
+            className="card commission-card"
+            key={commission.id}
+          >
+            <div className="row-head">
+              <div>
+                <h2>{commission.title}</h2>
 
-        <div className="stat-card">
-          <strong>{ongoing}</strong>
-          <span>Ongoing</span>
-        </div>
-
-        <div className="stat-card">
-          <strong>{completed}</strong>
-          <span>Completed</span>
-        </div>
-
-        <div className="stat-card">
-          <strong>{pending}</strong>
-          <span>Payment Pending</span>
-        </div>
-      </section>
-
-      <h2>Commission Board</h2>
-
-      {commissions.length === 0 ? (
-        <div className="card">
-          <p>No commissions yet.</p>
-        </div>
-      ) : (
-        <div className="card-grid">
-          {commissions.map((commission) => (
-            <article
-              className="card commission-card"
-              key={commission.id}
-            >
-              <div className="row-head">
-                <div>
-                  <h2>{commission.title}</h2>
-
-                  <p className="muted">
-                    for {commission.client_name}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  className="icon-button"
-                  title="Edit commission"
-                  aria-label={`Edit ${commission.title}`}
-                  onClick={() =>
-                    onEditCommission?.(commission.id)
-                  }
-                >
-                  ⚙
-                </button>
+                <p className="muted">
+                  for {commission.client_name}
+                </p>
               </div>
 
-              <p>
-                <strong>Commission Type:</strong>{' '}
-                {commission.commission_type}
-              </p>
+              <button
+                type="button"
+                className="icon-button"
+                title="Edit commission"
+                aria-label={`Edit ${commission.title}`}
+                onClick={() =>
+                  onEditCommission?.(commission.id)
+                }
+              >
+                ⚙
+              </button>
+            </div>
 
-              <p>
-                <strong>Payment Status:</strong>{' '}
+            <hr className="dotted" />
+
+            <p>
+              <strong>Commission Type:</strong>
+              <br />
+              {commission.commission_type}
+            </p>
+
+            <p>
+              <strong>Payment Status:</strong>
+              <br />
+              <span
+                className={`pay pay-${(
+                  commission.payment_status || ''
+                ).toLowerCase()}`}
+              >
                 {commission.payment_status}
-              </p>
+              </span>
+            </p>
 
-              <p>
-                <strong>Started:</strong>{' '}
-                {commission.starting_date || 'Not Specified'}
-              </p>
+            <p className="deadline">
+              <strong>
+                Deadline: {formatDate(commission.deadline)}
+              </strong>
+            </p>
+          </article>
+        ))}
 
-              <p>
-                <strong>Deadline:</strong>{' '}
-                {commission.deadline || 'Not Specified'}
-              </p>
-
-              <p>
-                <strong>Status:</strong>{' '}
-                {commission.status}
-              </p>
-            </article>
-          ))}
-        </div>
-      )}
+        {/* "+ Create Log" card: the empty state, and a shortcut at the end of the row */}
+        <button
+          type="button"
+          className="card create-card"
+          onClick={onCreateCommission}
+        >
+          <span className="plus">+</span>
+          Create Log
+        </button>
+      </div>
     </main>
   )
 }
