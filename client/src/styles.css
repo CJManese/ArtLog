@@ -525,46 +525,196 @@ button {
 
   align-items: stretch;
 
-  gap: 22px;
+  gap: 18px;
 
   overflow-x: auto;
 
   padding: 4px 4px 18px;
 }
 
+/*
+ * Mockup-sized dashboard logs.
+ * Keep these compact and consistent instead
+ * of letting the cards become tall.
+ */
 .card-scroll .card {
-  flex: 0 0 310px;
+  flex: 0 0 285px;
+  width: 285px;
 }
 
 /* Commission cards */
 
 .commission-card {
-  min-height: 300px;
+  height: 285px;
+  min-height: 285px;
 
   display: flex;
   flex-direction: column;
+
+  padding: 20px 22px;
+
+  overflow: hidden;
+}
+
+.commission-card .row-head {
+  min-height: 48px;
 }
 
 .commission-card h2 {
-  font-size: 21px;
-  line-height: 1.25;
+  margin-bottom: 3px;
+
+  font-size: 19px;
+  line-height: 1.2;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.commission-card .muted {
+  margin-bottom: 0;
+
+  font-size: 13px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.commission-card hr.dotted {
+  margin: 10px 0 12px;
 }
 
 .commission-card p {
-  margin-bottom: 11px;
+  margin-bottom: 8px;
 
-  font-size: 15px;
-  line-height: 1.45;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.commission-card p strong {
+  font-size: 13px;
+}
+
+/* Keep references compact */
+
+.commission-card .ref-block {
+  margin-top: 2px;
+
+  min-height: 0;
+}
+
+.commission-card .ref-toggle {
+  padding: 5px 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: var(--navy);
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.commission-card .ref-toggle:hover {
+  background: transparent;
+
+  filter: none;
+
+  text-decoration: underline;
+}
+
+.commission-card .ref-strip {
+  display: flex;
+
+  gap: 6px;
+
+  margin-top: 4px;
+
+  overflow: hidden;
+}
+
+.commission-card .ref-thumb {
+  flex: 0 0 42px;
+
+  width: 42px;
+  height: 42px;
+
+  overflow: hidden;
+
+  border-radius: 6px;
+
+  background: #eee;
+}
+
+.commission-card .ref-thumb img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
 }
 
 .commission-card .deadline {
   margin-top: auto;
 
-  padding-top: 18px;
+  padding-top: 8px;
 
   text-align: right;
 
+  font-size: 13px;
+
   font-weight: 600;
+
+  white-space: nowrap;
+}
+
+/* ================================
+   CREATE LOG CARD
+   ================================ */
+
+.page .card-scroll .create-card {
+  flex: 0 0 285px;
+
+  width: 285px;
+  height: 285px;
+  min-height: 285px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  border: 2px dashed rgba(50, 50, 50, 0.22);
+
+  border-radius: var(--radius);
+
+  background: rgba(255, 255, 255, 0.55);
+
+  color: var(--ink);
+
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.page .card-scroll .create-card:hover {
+  background: rgba(255, 255, 255, 0.8);
+
+  filter: none;
+}
+
+.create-card .plus {
+  font-size: 38px;
+  line-height: 1;
+
+  color: var(--navy);
 }
 
 /* ================================
@@ -889,6 +1039,246 @@ textarea {
 }
 
 /* ================================
+   CLIENT TABLE - MOCKUP STYLE
+   ================================ */
+
+.table-card {
+  padding: 0;
+
+  overflow: hidden;
+
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.client-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  table-layout: fixed;
+
+  font-size: 15px;
+}
+
+/* Header */
+
+.client-table thead {
+  background: #f3edf7;
+}
+
+.client-table th {
+  padding: 17px 22px;
+
+  color: #3e3b43;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  text-align: left;
+
+  border-bottom: 2px solid #d8d2dc;
+}
+
+.client-table th:first-child {
+  width: 90px;
+}
+
+.client-table th:nth-child(2) {
+  width: 40%;
+}
+
+.client-table th:nth-child(3) {
+  width: 30%;
+}
+
+.client-table th:nth-child(4) {
+  width: 20%;
+}
+
+/* Rows */
+
+.client-table tbody tr {
+  background: #ffffff;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    transform 0.05s ease;
+}
+
+.client-table tbody tr:hover {
+  background: #faf6fc;
+}
+
+.client-table td {
+  padding: 17px 22px;
+
+  border-bottom: 1px dotted #aaa;
+
+  color: #302e34;
+
+  vertical-align: middle;
+}
+
+.client-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* ID */
+
+.client-table td:first-child {
+  color: #77747d;
+
+  font-weight: 700;
+}
+
+/* Client name */
+
+.client-table td:nth-child(2) {
+  font-weight: 700;
+}
+
+/* Commission count */
+
+.client-table td:nth-child(3) {
+  color: #55525b;
+
+  font-weight: 600;
+}
+
+/* Status */
+
+.client-table td:nth-child(4) {
+  font-weight: 700;
+}
+
+/* Selected row */
+
+.client-table tbody tr.row-selected {
+  background: #eee7f5;
+}
+
+.client-table tbody tr.row-selected td {
+  color: #29252e;
+}
+
+/* Blacklisted client */
+
+.client-table tbody tr.row-bad {
+  background: #fff0f0;
+}
+
+.client-table tbody tr.row-bad:hover {
+  background: #ffe7e7;
+}
+
+.client-table tbody tr.row-bad td:last-child {
+  color: var(--red);
+}
+
+/* Empty table */
+
+.client-table .table-empty {
+  padding: 45px 25px;
+
+  color: var(--muted);
+
+  text-align: center;
+
+  cursor: default;
+}
+
+.client-table .table-empty:hover {
+  background: #ffffff;
+}
+
+/* ================================
+   CLIENT ACTIONS
+   ================================ */
+
+.table-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 18px;
+}
+
+.table-actions .spacer {
+  flex: 1;
+}
+
+.table-actions button {
+  min-width: 130px;
+}
+
+.table-actions .navy {
+  min-width: 155px;
+}
+
+/* ================================
+   CLIENT FORM
+   ================================ */
+
+.client-form {
+  max-width: 760px;
+
+  margin-bottom: 25px;
+}
+
+.client-form h2 {
+  margin-bottom: 22px;
+
+  font-size: 24px;
+}
+
+.client-form > label:not(.checkbox-row) {
+  display: block;
+
+  margin: 16px 0 7px;
+
+  color: #45434a;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.client-form textarea {
+  min-height: 110px;
+}
+
+.client-form .checkbox-row {
+  margin-top: 18px;
+
+  color: #55525b;
+
+  font-size: 14px;
+}
+
+/* ================================
+   CLIENT SEARCH
+   ================================ */
+
+.filters .filter-search {
+  max-width: 420px;
+
+  padding: 13px 17px;
+
+  border: 1px solid #aeb8c7;
+
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.94);
+
+  font-size: 14px;
+}
+
+/* ================================
    STATUS BADGES
    ================================ */
 
@@ -1134,7 +1524,7 @@ textarea {
     padding-right: 48px;
   }
 
-  .card-scroll .card {
-    flex-basis: 330px;
-  }
+   .card-scroll .card {
+     flex-basis: 285px;
+   }
 }
