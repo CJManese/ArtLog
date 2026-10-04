@@ -433,39 +433,54 @@ button {
 }
 
 .board-card {
-  padding-bottom: 12px;
+  padding: 20px 28px 10px;
 }
 
 .board-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .board-head h2 {
-  margin: 0 0 10px;
-  font-size: 26px;
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
 }
 
-.board-head .bar {
+.board-code {
+  color: #8a8791;            /* grey "AA 0001" */
+}
+
+.board-bar {
+  margin: 0 12px;
   font-weight: 300;
 }
 
 .board-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr 1fr;
   column-gap: 40px;
 }
 
-.board-grid p {
+.board-col p {
   display: grid;
   grid-template-columns: 150px 1fr;
-  margin-bottom: 4px;
+  margin: 0 0 6px;
   font-size: 16px;
 }
 
+.board-col p strong {
+  font-weight: 700;
+}
+
 .board-more {
-  margin-top: 12px;
+  margin-top: 14px;
+  padding-top: 6px;
+  border-top: 2px dotted #bbb;
 }
 
 .note-box {
@@ -473,25 +488,76 @@ button {
   padding: 8px 10px;
   border: 1px solid #555;
   border-radius: 4px;
+  background: #fafafa;
   font-size: 14px;
   white-space: pre-wrap;
 }
 
+.board-more .button-row {
+  margin-top: 14px;
+}
+
 .page .expand {
   display: block;
-  margin: 8px auto 0;
-  padding: 4px 12px;
+  margin: 6px auto 0;
+  padding: 4px 14px;
   background: transparent;
-  color: var(--ink);
+  color: #6d6a73;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .page .expand:hover {
   filter: none;
-  text-decoration: underline;
+  color: var(--ink);
 }
 
+/* ================================
+   FILTER BAR (pill shaped)
+   ================================ */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.filters input,
+.filters select {
+  width: auto;
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 13px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.filters .filter-search {
+  flex: 1 1 100%;
+  padding: 12px 22px;
+  font-size: 15px;
+}
+
+.filters select {
+  flex: 1 1 0;
+  min-width: 150px;
+}
+
+@media (max-width: 800px) {
+  .board-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .board-col p {
+    grid-template-columns: 130px 1fr;
+  }
+
+  .board-head h2 {
+    font-size: 22px;
+  }
+}
 /* ================================
    FILTER BAR (pill shaped)
    ================================ */
