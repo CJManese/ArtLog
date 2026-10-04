@@ -9,9 +9,7 @@ import {
 function CreateCommission({ onSaved, onCancel }) {
   const [clients, setClients] = useState([])
 
-  const [clientId, setClientId] = useState('')
-  const [newClientName, setNewClientName] = useState('')
-  const [useNewClient, setUseNewClient] = useState(false)
+  const [clientName, setClientName] = useState('')
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -24,7 +22,6 @@ function CreateCommission({ onSaved, onCancel }) {
 
   const [deadline, setDeadline] = useState('')
   const [paymentStatus, setPaymentStatus] = useState('Pending')
-  const [status, setStatus] = useState('Ongoing')
 
   const [referenceUrl, setReferenceUrl] = useState('')
 
@@ -53,13 +50,10 @@ function CreateCommission({ onSaved, onCancel }) {
 
     setError('')
 
-    if (!useNewClient && !clientId) {
-      setError('Please select a client.')
-      return
-    }
+    const typedName = clientName.trim()
 
-    if (useNewClient && !newClientName.trim()) {
-      setError('Please enter the new client name.')
+    if (!typedName) {
+      setError('Please enter or select a client.')
       return
     }
 
@@ -74,18 +68,27 @@ function CreateCommission({ onSaved, onCancel }) {
     }
 
     if (!startingDate) {
-      setError('Please select a starting date.')
+      setError('Please select a start date.')
       return
     }
 
     setSaving(true)
 
     try {
-      let finalClientId = clientId
+      // If the typed name matches an existing client, use it.
+      // Otherwise create a new client with that name.
+      const existing = clients.find(
+        (client) =>
+          client.name.toLowerCase() === typedName.toLowerCase()
+      )
 
-      if (useNewClient) {
+      let finalClientId
+
+      if (existing) {
+        finalClientId = existing.id
+      } else {
         const newClient = await createClient({
-          name: newClientName.trim(),
+          name: typedName,
           notes: '',
           blacklisted: false
         })
@@ -102,14 +105,11 @@ function CreateCommission({ onSaved, onCancel }) {
         starting_date: startingDate,
         deadline: deadline || null,
         payment_status: paymentStatus,
-        status
+        status: 'Ongoing'
       })
 
       if (referenceUrl.trim()) {
-        await createReference(
-          commission.id,
-          referenceUrl.trim()
-        )
+        await createReference(commission.id, referenceUrl.trim())
       }
 
       onSaved?.()
@@ -123,7 +123,6 @@ function CreateCommission({ onSaved, onCancel }) {
   if (loading) {
     return (
       <main className="page">
-        <h1>Create Log</h1>
         <p>Loading clients...</p>
       </main>
     )
@@ -131,231 +130,146 @@ function CreateCommission({ onSaved, onCancel }) {
 
   return (
     <main className="page">
-      <div className="page-header">
-        <div>
-          <h1>Commission Log</h1>
+      {error && <p className="error">{error}</p>}
+
+      <form className="card log-form" onSubmit={handleSubmit}>
+        <div className="log-head">
+          <h2>
+            <span className="log-navy">Commission</span> Log
+          </h2>
+
+          <select
+            aria-label="Payment status"
+            value={paymentStatus}
+            onChange={(event) => setPaymentStatus(event.target.value)}
+          >
+            <option value="Pending">Payment Status: Pending</option>
+            <option value="Paid">Payment Status: Paid</option>
+            <option value="Overdue">Payment Status: Overdue</option>
+          </select>
         </div>
-      </div>
 
-      {error && (
-        <p className="error">
-          {error}
-        </p>
-      )}
-
-      <form
-        className="card form-grid"
-        onSubmit={handleSubmit}
-      >
-        <label>Client</label>
-
-        <div className="client-choice">
-          <div className="radio-row">
-            <label>
-              <input
-                type="radio"
-                checked={!useNewClient}
-                onChange={() => setUseNewClient(false)}
-              />
-              Existing Client
-            </label>
-
-            <label>
-              <input
-                type="radio"
-                checked={useNewClient}
-                onChange={() => setUseNewClient(true)}
-              />
-              New Client
-            </label>
+        <div className="log-row2">
+          <div>
+            <label htmlFor="commission-title">Title</label>
+            <input
+              id="commission-title"
+              type="text"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder="Enter the title of your commission"
+              required
+            />
           </div>
 
-          {!useNewClient ? (
-            <select
-              value={clientId}
-              onChange={(event) =>
-                setClientId(event.target.value)
-              }
-            >
-              <option value="">
-                Select a client
-              </option>
-
-              {clients.map((client) => (
-                <option
-                  key={client.id}
-                  value={client.id}
-                >
-                  {client.name}
-                  {client.blacklisted
-                    ? ' — BLACKLISTED'
-                    : ''}
-                </option>
-              ))}
-            </select>
-          ) : (
+          <div>
+            <label htmlFor="commission-client">Commissioned by</label>
             <input
+              id="commission-client"
               type="text"
-              value={newClientName}
-              onChange={(event) =>
-                setNewClientName(event.target.value)
-              }
-              placeholder="Client name"
+              list="client-options"
+              value={clientName}
+              onChange={(event) => setClientName(event.target.value)}
+              placeholder="Enter the client, or select from the Clients list"
+              required
             />
-          )}
+            <datalist id="client-options">
+              {clients.map((client) => (
+                <option key={client.id} value={client.name} />
+              ))}
+            </datalist>
+          </div>
         </div>
-
-        <label htmlFor="commission-title">
-          Title
-        </label>
-
-        <input
-          id="commission-title"
-          type="text"
-          value={title}
-          onChange={(event) =>
-            setTitle(event.target.value)
-          }
-          placeholder="Commission title"
-          required
-        />
-
-        <label htmlFor="commission-description">
-          Description
-        </label>
-
-        <textarea
-          id="commission-description"
-          rows="4"
-          value={description}
-          onChange={(event) =>
-            setDescription(event.target.value)
-          }
-          placeholder="Optional description"
-        />
-
-        <label htmlFor="commission-notes">
-          Notes
-        </label>
-
-        <textarea
-          id="commission-notes"
-          rows="4"
-          value={notes}
-          onChange={(event) =>
-            setNotes(event.target.value)
-          }
-          placeholder="Optional notes"
-        />
-
-        <label htmlFor="commission-type">
-          Commission Type
-        </label>
-
-        <input
-          id="commission-type"
-          type="text"
-          value={commissionType}
-          onChange={(event) =>
-            setCommissionType(event.target.value)
-          }
-          placeholder="Portrait, illustration, etc."
-          required
-        />
-
-        <label htmlFor="starting-date">
-          Starting Date
-        </label>
-
-        <input
-          id="starting-date"
-          type="date"
-          value={startingDate}
-          onChange={(event) =>
-            setStartingDate(event.target.value)
-          }
-        />
-
-        <label htmlFor="deadline">
-          Deadline
-        </label>
-
-        <input
-          id="deadline"
-          type="date"
-          value={deadline}
-          onChange={(event) =>
-            setDeadline(event.target.value)
-          }
-        />
-
-        <label htmlFor="payment-status">
-          Payment Status
-        </label>
-
-        <select
-          id="payment-status"
-          value={paymentStatus}
-          onChange={(event) =>
-            setPaymentStatus(event.target.value)
-          }
-        >
-          <option value="Pending">Pending</option>
-          <option value="Paid">Paid</option>
-          <option value="Overdue">Overdue</option>
-        </select>
-
-        <label htmlFor="commission-status">
-          Status
-        </label>
-
-        <select
-          id="commission-status"
-          value={status}
-          onChange={(event) =>
-            setStatus(event.target.value)
-          }
-        >
-          <option value="Ongoing">Ongoing</option>
-          <option value="Completed">Completed</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
-
-        <label htmlFor="reference-url">
-          Reference
-        </label>
 
         <div>
-          <input
-            id="reference-url"
-            type="url"
-            value={referenceUrl}
-            onChange={(event) =>
-              setReferenceUrl(event.target.value)
-            }
-            placeholder="https://example.com/reference-image.jpg"
+          <label htmlFor="commission-description">
+            Description (Optional)
+          </label>
+          <textarea
+            id="commission-description"
+            rows="3"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            placeholder="Describe the commission in 300 words or less"
           />
-
-          <p className="field-help">
-            Optional image URL for the commission reference.
-          </p>
         </div>
 
-        <div className="button-row form-actions">
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={saving}
-          >
-            Cancel
-          </button>
+        <div>
+          <label htmlFor="commission-notes">Notes (Optional)</label>
+          <textarea
+            id="commission-notes"
+            rows="3"
+            value={notes}
+            onChange={(event) => setNotes(event.target.value)}
+            placeholder="Add notes or preferences in 300 words or less"
+          />
+        </div>
 
-          <button
-            type="submit"
-            disabled={saving}
-          >
-            {saving ? 'Saving...' : 'Save Commission'}
-          </button>
+        <div className="log-row3">
+          <div>
+            <label htmlFor="commission-type">Commission Type</label>
+            <input
+              id="commission-type"
+              type="text"
+              value={commissionType}
+              onChange={(event) => setCommissionType(event.target.value)}
+              placeholder="Enter Commission Type"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="starting-date">Started in</label>
+            <input
+              id="starting-date"
+              type="date"
+              value={startingDate}
+              onChange={(event) => setStartingDate(event.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="deadline">Deadline (Optional)</label>
+            <input
+              id="deadline"
+              type="date"
+              value={deadline}
+              onChange={(event) => setDeadline(event.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="log-bottom">
+          <div>
+            <label htmlFor="reference-url">References (Optional)</label>
+
+            <div className="ref-box">
+              <span className="ref-plus">+</span>
+
+              <input
+                id="reference-url"
+                type="url"
+                value={referenceUrl}
+                onChange={(event) => setReferenceUrl(event.target.value)}
+                placeholder="Paste an image link, https://..."
+              />
+            </div>
+          </div>
+
+          <div className="log-buttons">
+            <button type="submit" disabled={saving}>
+              {saving ? 'Saving...' : 'Save'}
+            </button>
+
+            <button
+              type="button"
+              className="link-button"
+              onClick={onCancel}
+              disabled={saving}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </form>
     </main>
